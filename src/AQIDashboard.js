@@ -4,7 +4,7 @@ import { Search, Cigarette, ThumbsUp, ThumbsDown, AlertTriangle, Skull, Share2, 
 
 
 
-const API_TOKEN = process.env.REACT_APP_API_TOKEN;
+const API_TOKEN = '69a78238e15f94c45ceae05acbf887019a9d90ef'
 
 
 const AQI_LEVELS = [
@@ -266,8 +266,14 @@ const CitySearch = ({ onCitySelect, showQuickCities = true }) => {
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
 
+  const handleCitySelect = (cityName) => {
+    onCitySelect(cityName);
+    setQuery(''); // Clear the search input
+    setResults([]); // Clear the results
+  };
+
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col">
       <div className="relative mb-4">
         <input
           type="text"
@@ -284,7 +290,7 @@ const CitySearch = ({ onCitySelect, showQuickCities = true }) => {
           {results.map((result) => (
             <li
               key={result.uid}
-              onClick={() => onCitySelect(result.station.name)}
+              onClick={() => handleCitySelect(result.station.name)}
               className="p-3 hover:bg-gray-100 cursor-pointer"
             >
               {result.station.name}
@@ -375,9 +381,9 @@ const AQIDashboard = () => {
   const backgroundColor = currentAQI ? `${color}33` : '#ffffff'; // 33 is 20% opacity in hex
 
   return (
-    <div className="flex flex-col md:flex-row h-screen font-sans overflow-hidden" style={{ backgroundColor }}>
+    <div className="flex flex-col md:flex-row font-sans" style={{ backgroundColor }}>
       {/* Mobile Search Bar */}
-      <div className="md:hidden w-full bg-white p-4 shadow-lg">
+      <div className="md:hidden w-full bg-white p-4 relative">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">How Many Cigs?</h2>
         <CitySearch onCitySelect={fetchAQI} showQuickCities={false} />
       </div>
