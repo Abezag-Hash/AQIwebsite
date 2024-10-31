@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Cigarette, ThumbsUp, ThumbsDown, AlertTriangle, Skull, Share2 } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import { Search, Cigarette, ThumbsUp, ThumbsDown, AlertTriangle, Skull, Share2, HelpCircle } from 'lucide-react';
+
 
 const API_TOKEN = '69a78238e15f94c45ceae05acbf887019a9d90ef';
 
@@ -18,7 +18,7 @@ const getAQIInfo = (aqi) => {
   return AQI_LEVELS.find(level => aqi <= level.max) || AQI_LEVELS[AQI_LEVELS.length - 1];
 };
 
-const CigaretteEquivalent = ({ aqi }) => {
+const CigaretteEquivalent = ({ aqi, pm25 }) => {
   let validAqi = isNaN(aqi) || aqi < 0 ? 0 : aqi;
   
   // Check if AQI is 980 or above
@@ -27,9 +27,10 @@ const CigaretteEquivalent = ({ aqi }) => {
       <div className="mt-8 text-center">
         <div className="text-2xl mb-6">
           The AQI of the current region has exceeded the maximum reading of the sensor. 
-          But it's at least {Math.round(1000/22)} cigarettes in 24 hours
+          Soooo, that's a lot? I don't know what to say. Take care! Stay indoors! Wear a mask! Airpurifier!
+           <h2 className="text-sm mb-4 text-gray-800">howmanycigs.com</h2>
        <div className="grid grid-cols-3 gap-6 justify-items-center max-w-[300px] mx-auto">
-        {[...Array(45)].map((_, i) => (
+        {[...Array(100)].map((_, i) => (
           <Cigarette key={i} size={100} className="text-gray-600" />
         ))}
       </div>
@@ -39,13 +40,14 @@ const CigaretteEquivalent = ({ aqi }) => {
   }
 
   // Calculate cigarettes and clamp the value between 0 and a reasonable upper bound, say 50
-  let cigarettes = Math.max(0, Math.floor(validAqi / 22));
+  let cigarettes = Math.max(0, Math.floor(pm25 / 22));
 
   return (
     <div className="mt-8 text-center">
       <div className="text-2xl mb-6">If you were breathing this air for 24 hours, you would have smoked</div>
       <div className="text-6xl font-bold mb-4">{cigarettes}</div>
-      <div className="text-2xl mb-6">Cigarettes Equivalents</div>
+      <div className="text-2xl mb-2">Cigarettes Equivalents</div>
+    <h2 className="text-sm mb-4 text-gray-800">howmanycigs.com</h2>
       <div className="grid grid-cols-3 gap-6 justify-items-center max-w-[300px] mx-auto">
         {[...Array(cigarettes)].map((_, i) => (
           <Cigarette key={i} size={100} className="text-gray-600" />
@@ -91,16 +93,14 @@ const getAQIIcon = (aqi) => {
   }
 };
 
-const AQIIndicator = ({ aqi, location }) => {
+const AQIIndicator = ({ aqi, pm25, location }) => {
   const { label, color } = getAQIInfo(aqi);
+  const [showInfo, setShowInfo] = useState(false);
 
   const handleShare = async () => {
     try {
-      const element = document.getElementById('share-content');
-      const canvas = await html2canvas(element);
-      const imageUrl = canvas.toDataURL('image/png');
-      
-      const shareText = `The AQI where I am is currently ${aqi} ppm. \n\nIf I was breathing this air for 24 hours, I would have smoked approximately ${Math.floor(aqi/22)} 🚬.\n \nFind out how many cigarette equivalents are you smoking at www.howmanycigs.com `;
+     
+      const shareText = `The AQI where I am is currently ${aqi} ppm. \n\nIf I was breathing this air for 24 hours, I would have smoked approximately ${Math.floor(pm25/22)} 🚬.\n \nFind out how many cigarette equivalents are you smoking at www.howmanycigs.com `;
       const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
       
       window.open(shareUrl, '_blank');
@@ -155,11 +155,11 @@ const AQIIndicator = ({ aqi, location }) => {
         <span>300</span>
         <span>500</span>
       </div>
-        <CigaretteEquivalent aqi={aqi} />
+        <CigaretteEquivalent aqi={aqi} pm25={pm25}/>
       </div>
       
-      {/* Share button */}
-      <div className="mt-6 flex justify-center">
+      {/* Share and Help buttons */}
+      <div className="mt-6 flex justify-center space-x-4">
         <button 
           onClick={handleShare}
           className="flex items-center px-4 py-2 bg-[#1DA1F2] text-white rounded-lg hover:bg-[#1a8cd8]"
@@ -167,7 +167,40 @@ const AQIIndicator = ({ aqi, location }) => {
           <Share2 className="mr-2" size={20} />
           Share on X
         </button>
+        <button
+          onClick={() => setShowInfo(!showInfo)}
+          className="flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+        >
+          <HelpCircle className="mr-2" size={20} />
+          How it works
+        </button>
       </div>
+      
+      {/* Info Modal */}
+      {showInfo && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 max-w-2xl max-h-[80vh] overflow-y-auto">
+            <h3 className="text-xl font-bold mb-4">How is this calculated?</h3>
+            <p className="mb-4">
+              Based on <a href="https://berkeleyearth.org/air-pollution-and-cigarette-equivalence/" style={{color: 'blue', textDecoration: 'underline'}}> this research</a>.
+            </p>
+             <p className="mb-4">
+             The health impacts of Air pollution are immense, latest research shows it increases stroke risk immensely and also impacts children disproportionately.</p>
+                <p className="mb-4">
+             Please share on social media to raise awareness, and incase there are any errors please let me know on my <a href="https://x.com/RadicalRasmalai" style={{color: 'orange', textDecoration: 'underline'}}>x.com</a></p>
+           <p className="mb-4">
+             This project was inspired by a similar project by <a href="https://medium.com/@jasminedevv/i-made-an-aqi-to-cigarettes-calculator-f407177c85c2" style={{color: 'blue', textDecoration: 'underline'}}>Jasmine Webb!</a> Kudos!
+            </p>
+            
+            <button 
+              onClick={() => setShowInfo(false)}
+              className="mt-6 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -190,7 +223,7 @@ const CitySearch = ({ onCitySelect, showQuickCities = true }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [quickCityAQIs, setQuickCityAQIs] = useState({});
-  const quickCities = ['London', 'New Delhi', 'New York', 'Paris', 'Tokyo'];
+  const quickCities = ['New Delhi','Bangalore','New York', 'London', 'Tokyo'];
 
   useEffect(() => {
     if (showQuickCities) {
@@ -199,6 +232,7 @@ const CitySearch = ({ onCitySelect, showQuickCities = true }) => {
         try {
           const response = await axios.get(`https://api.waqi.info/feed/${city}/?token=${API_TOKEN}`);
           if (response.data.status === 'ok') {
+            // console.log(response.data.data.iaqi.pm25.v)
             setQuickCityAQIs(prev => ({
               ...prev,
               [city]: response.data.data.aqi
@@ -215,6 +249,7 @@ const CitySearch = ({ onCitySelect, showQuickCities = true }) => {
     if (input.length > 2) {
       try {
         const response = await axios.get(`https://api.waqi.info/search/?token=${API_TOKEN}&keyword=${input}`);
+         console.log(response)
         setResults(response.data.data);
       } catch (error) {
         console.error('Error searching cities:', error);
@@ -275,6 +310,7 @@ const CitySearch = ({ onCitySelect, showQuickCities = true }) => {
 
 const AQIDashboard = () => {
   const [currentAQI, setCurrentAQI] = useState(null);
+  const [currentPM25, setCurrentPM25] = useState(null);
   const [location, setLocation] = useState('Loading...');
   const [error, setError] = useState(null);
 
@@ -284,8 +320,12 @@ const AQIDashboard = () => {
       if (response.data.status === 'error' || response.data.data.aqi === '-') {
         setError("The AQI of the current location cannot be determined due to lack of AQI monitors.");
         setCurrentAQI(null);
+        setLocation(null)
+         setCurrentPM25(null);
+        
       } else {
         setCurrentAQI(response.data.data.aqi);
+        setCurrentPM25(response.data.data.iaqi.pm25.v);
         setLocation(city);
         setError(null);
       }
@@ -293,6 +333,7 @@ const AQIDashboard = () => {
       console.error('Error fetching AQI:', error);
       setError("The AQI of the current location cannot be determined due to lack of AQI monitors.");
       setCurrentAQI(null);
+      setCurrentPM25(null);
     }
   };
 
@@ -305,8 +346,10 @@ const AQIDashboard = () => {
           if (response.data.status === 'error' || response.data.data.aqi === '-') {
             setError("The AQI of the current location cannot be determined due to lack of AQI monitors.");
             setCurrentAQI(null);
+            setCurrentPM25(null);
           } else {
             setCurrentAQI(response.data.data.aqi);
+             setCurrentPM25(response.data.data.iaqi.pm25.v);
             setLocation(response.data.data.city.name);
             setError(null);
           }
@@ -314,6 +357,7 @@ const AQIDashboard = () => {
           console.error('Error fetching current location AQI:', error);
           setError("The AQI of the current location cannot be determined due to lack of AQI monitors.");
           setCurrentAQI(null);
+          setCurrentPM25(null);
         }
       }, () => {
         setLocation('Unable to get location');
@@ -325,8 +369,11 @@ const AQIDashboard = () => {
     }
   }, []);
 
+  const { color } = currentAQI ? getAQIInfo(currentAQI) : { color: '#ffffff' };
+  const backgroundColor = currentAQI ? `${color}33` : '#ffffff'; // 33 is 20% opacity in hex
+
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-50 font-sans overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen font-sans overflow-hidden" style={{ backgroundColor }}>
       {/* Mobile Search Bar */}
       <div className="md:hidden w-full bg-white p-4 shadow-lg">
         <h2 className="text-2xl font-bold mb-4 text-gray-800">How Many Cigs?</h2>
@@ -345,7 +392,7 @@ const AQIDashboard = () => {
           {error ? (
             <div className="text-xl text-red-600 text-center">{error}</div>
           ) : (
-            currentAQI !== null && <AQIIndicator aqi={currentAQI} location={location} />
+            currentAQI !== null && <AQIIndicator aqi={currentAQI} pm25={currentPM25} location={location} />
           )}
         </div>
       </div>
