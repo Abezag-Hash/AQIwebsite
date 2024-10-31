@@ -3,7 +3,9 @@ import axios from 'axios';
 import { Search, Cigarette, ThumbsUp, ThumbsDown, AlertTriangle, Skull, Share2, HelpCircle } from 'lucide-react';
 
 
-const API_TOKEN = '69a78238e15f94c45ceae05acbf887019a9d90ef';
+
+const API_TOKEN = process.env.REACT_APP_API_TOKEN;
+
 
 const AQI_LEVELS = [
   { max: 50, label: 'Good', color: '#4CAF50' },              // Bright green
