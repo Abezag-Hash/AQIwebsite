@@ -4,7 +4,7 @@ import { Search, Cigarette, ThumbsUp, ThumbsDown, AlertTriangle, Skull, Share2, 
 
 
 
-const API_TOKEN = process.env.API_TOKEN
+const API_TOKEN = process.env.REACT_APP_API_TOKEN;
 
 
 const AQI_LEVELS = [
