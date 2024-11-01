@@ -193,6 +193,9 @@ const AQIIndicator = ({ aqi, pm25, location }) => {
            <p className="mb-4">
              This project was inspired by a similar project by <a href="https://medium.com/@jasminedevv/i-made-an-aqi-to-cigarettes-calculator-f407177c85c2" style={{color: 'blue', textDecoration: 'underline'}}>Jasmine Webb!</a> Kudos!
             </p>
+            <p className="mb-4">
+             Data Attribution to the <a href="https://waqi.info/" style={{color: 'blue', textDecoration: 'underline'}}>World Air Quality Index Project</a> as well as originating EPA.
+            </p>
             
             <button 
               onClick={() => setShowInfo(false)}
