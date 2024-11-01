@@ -329,7 +329,7 @@ const AQIDashboard = () => {
     try {
       const response = await axios.get(`https://api.waqi.info/feed/${city}/?token=${API_TOKEN}`);
       if (response.data.status === 'error' || response.data.data.aqi === '-') {
-        setError("The AQI of the current location cannot be determined due to lack of AQI monitors.");
+        setError("The AQI of the current location cannot be determined due to lack of AQI monitors. Please search a nearby locations!");
         setCurrentAQI(null);
         setLocation(null)
          setCurrentPM25(null);
@@ -342,7 +342,7 @@ const AQIDashboard = () => {
       }
     } catch (error) {
       console.error('Error fetching AQI:', error);
-      setError("The AQI of the current location cannot be determined due to lack of AQI monitors.");
+      setError("The AQI of the current location cannot be determined due to lack of AQI monitors. Please search a nearby locations!");
       setCurrentAQI(null);
       setCurrentPM25(null);
     }
@@ -355,7 +355,7 @@ const AQIDashboard = () => {
         try {
           const response = await axios.get(`https://api.waqi.info/feed/geo:${latitude};${longitude}/?token=${API_TOKEN}`);
           if (response.data.status === 'error' || response.data.data.aqi === '-') {
-            setError("The AQI of the current location cannot be determined due to lack of AQI monitors.");
+            setError("The AQI of the current location cannot be determined due to lack of AQI monitors.Please search a nearby locations!");
             setCurrentAQI(null);
             setCurrentPM25(null);
           } else {
@@ -366,13 +366,13 @@ const AQIDashboard = () => {
           }
         } catch (error) {
           console.error('Error fetching current location AQI:', error);
-          setError("The AQI of the current location cannot be determined due to lack of AQI monitors.");
+          setError("The AQI of the current location cannot be determined due to lack of AQI monitors. Please search a nearby locations!");
           setCurrentAQI(null);
           setCurrentPM25(null);
         }
       }, () => {
         setLocation('Unable to get location');
-        setError("The AQI of the current location cannot be determined due to lack of AQI monitors.");
+        setError("The AQI of the current location cannot be determined due to lack of AQI monitors. Please search a nearby locations!");
       });
     } else {
       setLocation('Geolocation not supported');
